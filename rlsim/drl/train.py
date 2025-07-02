@@ -79,8 +79,12 @@ def train_DQN(task, logger, config):
             info = simulator.step(temperature)
             replay_list[-1].add(info)
             logger.info(f"  tstep : {tstep}")
+        update_start = time.time()
+        logger.info(f"Starting model update at epoch {epoch}")
         train_config["update_params"].update({"episode_size": int(1 + epoch ** (2 / 3))})
         loss = trainer.update(memory_l=replay_list, mode=train_mode, **train_config["update_params"])
+        update_end = time.time()
+        logger.info(f"Finished model update at epoch {epoch}, duration: {update_end - update_start:.2f} seconds")
         with open(task + "/loss.txt", "a") as file:
             file.write(str(epoch) + "\t" + str(loss) + "\n")
             logger.info(f"   Loss : {loss:.3f}")
